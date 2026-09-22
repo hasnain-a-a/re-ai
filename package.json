@@ -1,0 +1,54 @@
+{
+  "name": "@hasnain-a-a/re-ai",
+  "version": "1.0.0",
+  "description": "Universal AI infrastructure — multi-provider agentic client with MCP tool registry, cost tracking, and NestJS adapter",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./nest": {
+      "types": "./dist/nest/index.d.ts",
+      "import": "./dist/nest/index.js",
+      "require": "./dist/nest/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "publish:github": "node ./scripts/publish-github.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1"
+  },
+  "peerDependencies": {
+    "@nestjs/common": ">=10",
+    "@nestjs/core": ">=10",
+    "reflect-metadata": ">=0.1"
+  },
+  "peerDependenciesMeta": {
+    "@nestjs/common": { "optional": true },
+    "@nestjs/core": { "optional": true },
+    "reflect-metadata": { "optional": true }
+  },
+  "devDependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "reflect-metadata": "^0.2.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hasnain-a-a/re-ai.git"
+  }
+}
