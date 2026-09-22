@@ -1,28 +1,19 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { McpTool, Message, ChatOptions, ChatResult } from '../core/types.js';
-
-// Anthropic pricing per million tokens (as of 2024)
-const PRICING: Record<string, { input: number; output: number }> = {
-  'claude-opus-4': { input: 15, output: 75 },
-  'claude-sonnet-4-5': { input: 3, output: 15 },
-  'claude-sonnet-4-6': { input: 3, output: 15 },
-  'claude-haiku-4-5-20251001': { input: 0.8, output: 4 },
-};
-
-function costUsd(model: string, inputTokens: number, outputTokens: number): number {
-  const key = Object.keys(PRICING).find((k) => model.includes(k.split('-').slice(-2).join('-'))) ?? 'claude-sonnet-4-5';
-  const p = PRICING[key] ?? PRICING['claude-sonnet-4-5'];
-  return (inputTokens * p.input + outputTokens * p.output) / 1_000_000;
-}
+import type { McpTool, ChatOptions, ChatResult } from '../core/types.js';
+import { calculateCostUsd } from '../core/pricing.js';
 
 export async function anthropicChat(
   apiKey: string,
   model: string,
   options: ChatOptions,
   tools: McpTool[],
-  maxLoops: number,
+  maxSteps: number,
+  baseURL?: string,
 ): Promise<ChatResult> {
-  const client = new Anthropic({ apiKey });
+  const client = new Anthropic({
+    apiKey,
+    baseURL: baseURL || undefined,
+  });
 
   const anthropicTools: Anthropic.Tool[] = tools.map((t) => ({
     name: t.name,
@@ -41,7 +32,7 @@ export async function anthropicChat(
   let toolCallsExecuted = 0;
   let finalText = '';
 
-  for (let loop = 0; loop < maxLoops; loop++) {
+  for (let step = 0; step < maxSteps; step++) {
     const resp = await client.messages.create({
       model,
       max_tokens: options.maxTokens ?? 1024,
@@ -78,7 +69,7 @@ export async function anthropicChat(
           const result = await tool.execute(block.input as Record<string, unknown>);
           output = typeof result === 'string' ? result : JSON.stringify(result);
         } catch (err: unknown) {
-          output = JSON.stringify({ error: String(err) });
+          output = JSON.stringify({ error: err instanceof Error ? err.message : String(err) });
         }
       }
       toolCallsExecuted++;
@@ -87,6 +78,11 @@ export async function anthropicChat(
 
     // Append tool results as user turn
     messages.push({ role: 'user', content: toolResults });
+
+    // If max steps reached after tool calls, break
+    if (step + 1 >= maxSteps) {
+      break;
+    }
   }
 
   return {
@@ -94,8 +90,10 @@ export async function anthropicChat(
     usage: {
       inputTokens: totalInput,
       outputTokens: totalOutput,
-      estimatedCostUsd: costUsd(model, totalInput, totalOutput),
+      totalTokens: totalInput + totalOutput,
+      estimatedCostUsd: calculateCostUsd('anthropic', model, totalInput, totalOutput),
     },
     toolCallsExecuted,
+    durationMs: 0,
   };
 }

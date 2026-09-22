@@ -23,18 +23,32 @@ export interface ChatOptions {
   maxTokens?: number;
   context?: string;
   userId?: string;
+  /** Maximum number of agentic steps (LLM call + tool execution cycles). Default: 1 */
+  maxSteps?: number;
 }
 
 export interface ChatResult {
   content: string;
-  usage: { inputTokens: number; outputTokens: number; estimatedCostUsd: number };
+  usage: {
+    inputTokens: number;
+    outputTokens: number;
+    totalTokens: number;
+    estimatedCostUsd: number;
+  };
   toolCallsExecuted: number;
+  /** Execution duration from start to end in milliseconds */
+  durationMs: number;
 }
 
 export interface AiClientConfig {
   provider?: Provider;
   apiKey?: string;
   model?: string;
+  /** Custom base URL for the API (e.g. for Ollama host, DeepSeek, or custom proxies) */
+  baseURL?: string;
+  /** Maximum number of agentic steps (LLM call + tool execution cycles). Default: 1 */
+  maxSteps?: number;
+  /** Backwards-compatible alias for maxSteps */
   maxAgentLoops?: number;
   telemetry?: {
     postgresPool?: { query: (sql: string, params?: unknown[]) => Promise<unknown> };

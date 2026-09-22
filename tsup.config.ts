@@ -10,5 +10,10 @@ export default defineConfig({
   splitting: false,
   sourcemap: false,
   clean: true,
+  outExtension({ format }) {
+    return {
+      js: format === 'esm' ? '.js' : '.cjs',
+    };
+  },
   external: ['@nestjs/common', '@nestjs/core', 'reflect-metadata', 'pg'],
 });
