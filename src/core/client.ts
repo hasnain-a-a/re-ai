@@ -136,6 +136,7 @@ export class AiClient {
     const model = this.resolveModel(provider, options.model);
     const maxSteps = options.maxSteps ?? this.config.maxSteps ?? this.config.maxAgentLoops ?? 1;
     const baseURL = this.config.baseURL;
+    const tools = options.tools ? [...this.tools, ...options.tools] : this.tools;
 
     const start = Date.now();
     let result: ChatResult;
@@ -143,27 +144,27 @@ export class AiClient {
     switch (provider) {
       case 'anthropic': {
         const apiKey = this.resolveApiKey(provider);
-        result = await anthropicChat(apiKey, model, options, this.tools, maxSteps, baseURL);
+        result = await anthropicChat(apiKey, model, options, tools, maxSteps, baseURL);
         break;
       }
       case 'openai': {
         const apiKey = this.resolveApiKey(provider);
-        result = await openaiChat(apiKey, model, options, this.tools, maxSteps, baseURL);
+        result = await openaiChat(apiKey, model, options, tools, maxSteps, baseURL);
         break;
       }
       case 'gemini': {
         const apiKey = this.resolveApiKey(provider);
-        result = await geminiChat(apiKey, model, options, this.tools, maxSteps, baseURL);
+        result = await geminiChat(apiKey, model, options, tools, maxSteps, baseURL);
         break;
       }
       case 'deepseek': {
         const apiKey = this.resolveApiKey(provider);
-        result = await deepseekChat(apiKey, model, options, this.tools, maxSteps, baseURL);
+        result = await deepseekChat(apiKey, model, options, tools, maxSteps, baseURL);
         break;
       }
       case 'ollama': {
         const apiKey = this.resolveApiKey(provider);
-        result = await ollamaChat(model, options, this.tools, maxSteps, baseURL, apiKey);
+        result = await ollamaChat(model, options, tools, maxSteps, baseURL, apiKey);
         break;
       }
       default: {

@@ -25,6 +25,8 @@ export interface ChatOptions {
   userId?: string;
   /** Maximum number of agentic steps (LLM call + tool execution cycles). Default: 1 */
   maxSteps?: number;
+  /** Optional tools to use for this specific chat call (merged with registered tools) */
+  tools?: McpTool[];
 }
 
 export interface ChatResult {

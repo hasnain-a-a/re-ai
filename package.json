@@ -2,6 +2,7 @@
   "name": "@hasnain-a-a/re-ai",
   "version": "1.1.0",
   "description": "Universal AI infrastructure — multi-provider agentic client with MCP tool registry, cost tracking, and NestJS adapter",
+  "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
