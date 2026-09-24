@@ -1,5 +1,6 @@
 export { AiClient, DEFAULT_MODELS, SUPPORTED_PROVIDERS } from './core/client.js';
 export { calculateCostUsd, MODEL_PRICING, type TokenPricing } from './core/pricing.js';
+export { getAiUsage, type AiUsageFilters, type AiUsageReport, type UsageQueryPool } from './core/usage.js';
 export { anthropicChat } from './providers/anthropic.js';
 export { openaiChat } from './providers/openai.js';
 export { geminiChat } from './providers/gemini.js';
